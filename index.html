@@ -1,0 +1,916 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>10 Reasons — For You</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1: #fff6f4;
+  --bg2: #fffaf8;
+  --peach-1: #ffd7cc;
+  --peach-2: #ffb6a3;
+  --muted: #6b7280;
+  --accent: #ff6f61;
+  --card: #ffffff;
+  --shadow: 0 12px 40px rgba(15,23,42,0.08);
+  --radius: 18px;
+  --max-width:820px;
+  --accent-dark: #ff5f50;
+}
+html,body{height:100%;}
+body{
+  margin:0;
+  font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto;
+  background: linear-gradient(160deg,var(--bg1) 0%, var(--bg2) 100%);
+  display:flex;align-items:center;justify-content:center;
+  padding:30px;
+  -webkit-font-smoothing:antialiased;
+  color:#071422;
+  overflow:hidden;
+}
+
+/* Stage */
+.stage{
+  width:100%;
+  max-width:var(--max-width);
+  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.98));
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:40px;
+  position:relative; /* important for maybeBtn positioning */
+  overflow:visible;
+}
+
+/* soft floating background shapes */
+.float-shape{
+  position:absolute;
+  border-radius:50%;
+  filter:blur(36px) saturate(120%);
+  opacity:0.12;
+  transform:translateZ(0);
+  pointer-events:none;
+  animation:float 10s ease-in-out infinite alternate;
+}
+.float1{ width:320px; height:320px; background: linear-gradient(180deg,var(--peach-1),var(--peach-2)); right:-80px; top:-80px; }
+.float2{ width:220px; height:220px; background: #ffd4c2; left:-60px; bottom:-50px; animation-duration:14s; animation-delay:1.5s; }
+@keyframes float{ to { transform: translateY(30px) translateX(20px) scale(1.03); }}
+
+/* header */
+.header{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.title h1{ margin:0; font-size:20px; letter-spacing:-0.2px; }
+.title p{ margin:0; color:var(--muted); font-size:13px; }
+
+/* play button */
+.play-btn{
+  border:1px solid rgba(7,16,35,0.05);
+  background:rgba(255,255,255,0.7);
+  padding:8px 14px;
+  border-radius:999px;
+  cursor:pointer;
+  font-size:13px;
+  display:inline-flex; gap:8px; align-items:center;
+}
+.play-btn:hover{ transform:translateY(-3px); transition:transform .18s; }
+
+/* content */
+.content{ margin-top:26px; display:flex; flex-direction:column; gap:18px; }
+.lead{ color:#0b2a2a; font-size:15px; line-height:1.45; max-width:720px; }
+
+/* reason card */
+.card-wrap{ margin-top:8px; display:flex; align-items:center; justify-content:center; min-height:160px; }
+.reason-card {
+  width:100%;
+  max-width:740px;
+  background:var(--card);
+  border-radius:14px;
+  padding:26px 28px;
+  box-shadow: 0 8px 30px rgba(11,33,43,0.06);
+  transform-origin:center;
+  opacity:0;
+  transform: translateY(18px) scale(.99);
+  transition: all 520ms cubic-bezier(.2,.9,.25,1);
+}
+.reason-card.show{
+  opacity:1;
+  transform: translateY(0) scale(1);
+}
+.reason-text{ margin:0; font-size:18px; color:#071422; font-weight:600; }
+.counter{ margin-top:10px; color:var(--muted); font-size:13px; }
+
+/* caption (typewriter container) */
+.caption{
+  margin-top:8px;
+  font-size:14px;
+  color:var(--muted);
+  min-height:22px;
+  transition:opacity .45s ease, transform .45s ease;
+  opacity:1;
+  transform: translateY(0);
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+
+/* controls */
+.controls{ margin-top:18px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; position:relative; }
+.btn{
+  border:0; padding:12px 18px; border-radius:999px; font-weight:700; cursor:pointer; font-size:14px;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.btn.primary{
+  background: linear-gradient(90deg,var(--accent), #ff8a73);
+  color:white;
+  box-shadow: 0 10px 24px rgba(255,111,97,0.12);
+}
+.btn.primary:hover{ transform:translateY(-3px); }
+.btn.ghost{
+  background:transparent; border:1px solid rgba(7,16,35,0.06); color:var(--muted);
+}
+.final-actions{ margin-left:auto; display:flex; gap:10px; align-items:center; position:relative; }
+
+/* maybe button - absolute within stage so it can teleport */
+#maybeBtn{
+  position:absolute;
+  transition: left .45s cubic-bezier(.2,.9,.25,1), top .45s cubic-bezier(.2,.9,.25,1), transform .28s ease;
+  z-index:1300;
+  cursor:pointer;
+}
+
+/* disabled button look */
+.btn[disabled]{
+  opacity:0.7;
+  cursor:not-allowed;
+}
+
+/* emoji particles */
+.emoji {
+  position:fixed;
+  pointer-events:none;
+  font-size:20px;
+  will-change: transform, opacity;
+  z-index:1400;
+  text-shadow: 0 4px 18px rgba(12,18,25,0.06);
+}
+
+/* confetti (yes) */
+.confetti-piece{
+  position:fixed;
+  width:8px; height:10px;
+  z-index:1500;
+  border-radius:2px;
+  pointer-events:none;
+}
+
+/* signature */
+.signature{ margin-top:20px; text-align:right; color:var(--muted); font-size:13px; }
+
+/* minimal follow-up area: countdown + note */
+.followup{
+  margin-top:18px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  background: linear-gradient(180deg, rgba(255,250,249,0.85), rgba(255,245,243,0.85));
+  padding:16px;
+  border-radius:12px;
+  border:1px solid rgba(11,33,43,0.03);
+}
+.countdown{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  font-weight:700;
+  color:#0b2a2a;
+  margin-top:8px;
+}
+.countdown .unit{
+  background:white;
+  padding:8px 10px;
+  border-radius:10px;
+  box-shadow: 0 6px 18px rgba(11,33,43,0.05);
+  min-width:60px;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.unit .number{ font-size:18px; font-weight:800; color:#071422; }
+.unit .label{ font-size:12px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:0.6px; }
+
+/* followup-note */
+.followup-note{ color:var(--muted); font-size:14px; }
+
+/* surprise reveal */
+.surprise{
+  margin-top:14px;
+  padding:16px;
+  border-radius:12px;
+  background: linear-gradient(90deg,#fff7f6,#fff2ef);
+  border: 1px solid rgba(255,111,97,0.06);
+  display:none;
+  text-align:center;
+}
+
+/* cheeky bubble style */
+.cheeky-bubble {
+  position:absolute;
+  left:50%;
+  bottom:80px;
+  transform:translateX(-50%) translateY(0);
+  background: linear-gradient(90deg,#fff,#fff6f5);
+  padding:10px 18px;
+  border-radius:14px;
+  box-shadow:0 8px 30px rgba(11,33,43,0.08);
+  font-size:14px;
+  color:#0b2a2a;
+  z-index:1200;
+  opacity:0;
+  transition:opacity .28s ease, transform .45s cubic-bezier(.2,.9,.25,1);
+}
+
+/* cover overlay */
+.cover{
+  position:fixed; inset:0; z-index:2000;
+  display:flex; align-items:center; justify-content:center; background:linear-gradient(180deg, rgba(255,244,242,0.98), rgba(255,250,249,0.96));
+}
+.cover-card{
+  width:92%; max-width:520px; background:var(--card); padding:28px; border-radius:16px; text-align:center;
+  box-shadow: 0 20px 60px rgba(15,23,42,0.08);
+  transform-origin:center;
+  animation:coverIn .7s cubic-bezier(.16,.85,.24,1);
+}
+@keyframes coverIn{ from{opacity:0; transform:translateY(18px) scale(.995)} to{opacity:1; transform:translateY(0) scale(1)} }
+.cover h2{ margin:0 0 8px 0; font-size:24px; }
+.cover p{ margin:0; color:var(--muted); font-size:15px; }
+
+/* playful wiggle */
+@keyframes wiggle {
+  0% { transform: translateX(0) rotate(0deg); }
+  25% { transform: translateX(-6px) rotate(-6deg); }
+  50% { transform: translateX(6px) rotate(6deg); }
+  75% { transform: translateX(-4px) rotate(-3deg); }
+  100% { transform: translateX(0) rotate(0deg); }
+}
+
+/* bounce animation for reason */
+@keyframes bounceIn {
+  0% { transform: translateY(24px) scale(.98); opacity:0; }
+  60% { transform: translateY(-8px) scale(1.02); opacity:1; }
+  100% { transform: translateY(0) scale(1); opacity:1; }
+}
+
+/* responsive */
+@media (max-width:640px){
+  .stage{ padding:24px; }
+  .reason-text{ font-size:17px; }
+  .cover-card{ padding:20px; }
+  .countdown .unit{ min-width:46px; font-size:13px; padding:8px; }
+}
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover" id="cover">
+  <div class="cover-card" role="dialog" aria-modal="true">
+    <h2 id="coverTitle">Hi, [HER NAME] 🌸</h2>
+    <p style="margin-top:10px; line-height:1.5;">I made a little page with 10 honest reasons — each one is short. Tap <strong>Begin</strong> when you're ready. (No pressure ✨)</p>
+    <div style="margin-top:20px;">
+      <button id="startBtn" class="btn primary" style="padding:12px 22px;">Begin</button>
+    </div>
+  </div>
+</div>
+
+<div class="stage" id="stage" aria-hidden="true">
+  <div class="float-shape float1" aria-hidden="true"></div>
+  <div class="float-shape float2" aria-hidden="true"></div>
+
+  <div class="header">
+    <div class="title">
+      <h1>Hey, <span id="herName">[HER NAME]</span></h1>
+      <p>10 Reasons - Mujhse Dosti Karogi? IT guy way (Friendzone nhi)</p>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:10px;">
+      <button class="play-btn" id="playBtn" aria-pressed="false">► Piano</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <p class="lead">I kept these short and honest. Click <strong>Next</strong> to reveal each one — there are tiny surprises along the way 😉</p>
+
+    <div class="card-wrap">
+      <div class="reason-card" id="reasonCard" role="status" aria-live="polite" aria-atomic="true">
+        <p class="reason-text" id="reasonText">Press “Next” to begin.</p>
+        <div class="counter" id="counterText">0 / 10</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn primary" id="nextBtn">Next ➜</button>
+
+      <div class="final-actions" id="finalActions" hidden>
+        <button class="btn primary" id="yesBtn">Yes — let's try 💫</button>
+        <!-- maybeBtn will be moved into .stage for teleporting behavior -->
+        <button class="btn ghost" id="maybeBtn" aria-label="Maybe later">Maybe later</button>
+      </div>
+    </div>
+
+    <div class="caption" id="caption"></div>
+
+    <!-- follow-up area: countdown + simple note (no scheduling form) -->
+    <div id="followUpArea" class="followup" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <div style="font-weight:700;">Next Surprise on 22 Oct</div>
+          <div class="followup-note">The next surprise will unlock at 00:01 IST on 22 Oct.</div>
+        </div>
+        <div id="countdownContainer" style="text-align:right;">
+          <div class="small-muted" style="font-size:13px;">Next surprise starts at</div>
+          <div class="small-muted" id="targetDateDisplay" style="margin-top:4px;">22 Oct — 00:01 (IST)</div>
+          <div class="countdown" id="countdown" style="margin-top:8px;">
+            <div class="unit">
+              <div class="number" id="cdDays">--</div>
+              <div class="label">Days</div>
+            </div>
+            <div class="unit">
+              <div class="number" id="cdHours">--</div>
+              <div class="label">Hours</div>
+            </div>
+            <div class="unit">
+              <div class="number" id="cdMins">--</div>
+              <div class="label">Minutes</div>
+            </div>
+            <div class="unit">
+              <div class="number" id="cdSecs">--</div>
+              <div class="label">Seconds</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="surprise" id="surpriseBox" aria-live="polite">
+        <div style="font-weight:700; font-size:16px;">Surprise — coming soon 🎁</div>
+        <div id="surpriseContent" style="margin-top:12px; color:var(--muted);">The next surprise will appear here on the target date (22 Oct 00:01 IST).</div>
+
+        <!-- Button that will open birthday.html — initially disabled until countdown reaches zero -->
+        <div style="margin-top:12px;">
+          <button id="openBirthdayBtn" class="btn primary" disabled aria-disabled="true" title="Opens on 22 Oct">Open Birthday</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="signature" id="signature">— <span id="yourName">[YOUR NAME]</span></p>
+  </div>
+</div>
+
+<!-- audio -->
+<audio id="bgAudio" loop preload="none">
+  <source src="https://cdn.pixabay.com/download/audio/2022/10/03/audio_6c8a8c83f2.mp3?filename=soft-piano-ambient-122702.mp3" type="audio/mpeg">
+  <!-- Replace with your own track if you'd like -->
+</audio>
+
+<script>
+/* ========== EDITABLE FIELDS ========== */
+// Put names here if you want to set them directly; leave blank to keep placeholders
+const HER_NAME = "Nikita";   // <-- put her name here (optional)
+const YOUR_NAME = "Jatin";  // <-- put your name here (optional)
+
+/* WEBHOOK CONFIG - put your deployed Apps Script web app URL and the secret token here */
+const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwsm5RwOvkZktOEpZYano0vS8wgO3mEWtV9vGeSanMx7OON51rS8Vg0oJ5kp1cY24CwMg/exec"; // <-- replace with your Apps Script web app URL
+const WEBHOOK_TOKEN = "ilovekupwara"; // <-- must match the token in your Apps Script
+
+/* ===================================== */
+
+/* Reasons + captions arrays */
+const REASONS = [
+  "I actually listen — and I remember those tiny details you mention.",
+  "I’ll be your coolest friend with latest trends.",
+  "I’ll try to put a smile on that beautiful face.",
+  "I’ll make chapati and tea for you.",
+  "I’ll be the first one to root for your style.",
+  "I’ll be honest, even when it’s awkward.",
+  "I’ll plan small surprises.",
+  "I’ll make sure you smile when it's needed.",
+  "I’ll notice when you’re quiet and hold space for you.",
+  "Because I want to know you properly — not just surface-level."
+];
+
+const CAPTIONS = [
+  "Because I actually pay attention... even to the tiny things you think I’d forget 😉",
+  "You’ll never have to scroll for the trend — I’ll probably send it first 😎",
+  "Smiles look better on you — that’s just facts 💖",
+  "Yes, I can cook... but only if you promise to do the taste test 😋🍵",
+  "Your style deserves a hype team — I volunteer 🔥",
+  "Honesty might be awkward, but it’s also kinda rare... so you get it raw 🫣💬",
+  "Tiny surprises, big smiles 🎁",
+  "Even bad days deserve a little laughter — I’ll bring the funny 😄🌤️",
+  "I notice the silence too — sometimes it says more than words 💭",
+  "Because knowing you isn’t casual — it’s something I actually care about 💕"
+];
+
+/* Cheeky interlude lines for specific positions (after 2nd, 5th, 7th, 9th) */
+const CHEEKY_COMMENTS = {
+  2: [
+    "You still reading? 👀 someone’s curious...",
+    "Haha, you’re actually reading all of them 😄",
+    "Caught you smiling — admit it 😉"
+  ],
+  5: [
+    "Halfway there! Not giving up already, right? 😏",
+    "5 down, 5 to go — impressed yet? 😌",
+    "Woah, you made it halfway! Determined, I see 💪"
+  ],
+  7: [
+    "Okay... you’re invested now 😌",
+    "Still here? Cute. 🥹",
+    "You’re not skipping, right? 👀"
+  ],
+  9: [
+    "Almost done... nervous yet? 😅",
+    "One more to go... I saved the best for last 💫",
+    "Okay last one coming — promise it’s worth it ❤️"
+  ]
+};
+
+/* DOM refs */
+const cover = document.getElementById('cover');
+const startBtn = document.getElementById('startBtn');
+const coverTitle = document.getElementById('coverTitle');
+const stage = document.getElementById('stage');
+const herNameEl = document.getElementById('herName');
+const yourNameEl = document.getElementById('yourName');
+const reasonText = document.getElementById('reasonText');
+const counterText = document.getElementById('counterText');
+const nextBtn = document.getElementById('nextBtn');
+const reasonCard = document.getElementById('reasonCard');
+const finalActions = document.getElementById('finalActions');
+const yesBtn = document.getElementById('yesBtn');
+const maybeBtn = document.getElementById('maybeBtn');
+const captionEl = document.getElementById('caption');
+const bgAudio = document.getElementById('bgAudio');
+const playBtn = document.getElementById('playBtn');
+
+const followUpArea = document.getElementById('followUpArea');
+const cdDays = document.getElementById('cdDays');
+const cdHours = document.getElementById('cdHours');
+const cdMins = document.getElementById('cdMins');
+const cdSecs = document.getElementById('cdSecs');
+const targetDateDisplay = document.getElementById('targetDateDisplay');
+const surpriseBox = document.getElementById('surpriseBox');
+const surpriseContent = document.getElementById('surpriseContent');
+const openBirthdayBtn = document.getElementById('openBirthdayBtn');
+
+/* Insert names if provided */
+if (HER_NAME && HER_NAME.trim().length) {
+  herNameEl.textContent = HER_NAME;
+  coverTitle.textContent = `Hi, ${HER_NAME} 🌸`;
+}
+if (YOUR_NAME && YOUR_NAME.trim().length) {
+  yourNameEl.textContent = YOUR_NAME;
+}
+
+/* State */
+let idx = 0;
+const EMOJIS = ['❤️','💫','😄','🌸','✨','💕','😊','🌷'];
+let captionTyping = null;
+
+/* Typewriter for captions */
+function typeCaption(text, speed = 28) {
+  if (captionTyping) clearInterval(captionTyping.timer);
+  captionEl.textContent = "";
+  let i = 0;
+  captionEl.style.opacity = '1';
+  captionTyping = {
+    timer: setInterval(() => {
+      captionEl.textContent += text.charAt(i);
+      i++;
+      if (i >= text.length) {
+        clearInterval(captionTyping.timer);
+        captionTyping = null;
+      }
+    }, speed)
+  };
+}
+
+/* Helper: spawn floating emoji near Next button */
+function spawnEmoji() {
+  const emoji = EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
+  const el = document.createElement('div');
+  el.className = 'emoji';
+  el.textContent = emoji;
+
+  const rect = nextBtn.getBoundingClientRect();
+  const startX = rect.left + rect.width/2 + (Math.random()*40 - 20);
+  const startY = rect.top + (Math.random()*10 - 10);
+
+  Object.assign(el.style, {
+    left: startX + 'px',
+    top: startY + 'px',
+    opacity: '0',
+    transform: 'translateY(0) scale(0.9)'
+  });
+
+  document.body.appendChild(el);
+
+  const dx = (Math.random()*80 - 40);
+  const dy = - (140 + Math.random()*80);
+
+  el.animate([
+    { transform: 'translateY(0) scale(0.9)', opacity: 0 },
+    { transform: `translate(${dx}px, ${dy}px) scale(1.05)`, opacity: 1 },
+    { transform: `translate(${dx}px, ${dy-40}px) scale(0.9)`, opacity: 0 }
+  ], {
+    duration: 1400 + Math.random()*600,
+    easing: 'cubic-bezier(.2,.8,.25,1)'
+  });
+
+  setTimeout(() => el.remove(), 2200);
+}
+
+/* Insert cheeky bubble interlude (appears temporarily) */
+function insertCheekyComment(positionIndex) {
+  const lines = CHEEKY_COMMENTS[positionIndex];
+  if (!lines || lines.length === 0) return;
+  const text = lines[Math.floor(Math.random() * lines.length)];
+
+  const bubble = document.createElement('div');
+  bubble.className = 'cheeky-bubble';
+  bubble.textContent = text;
+
+  stage.appendChild(bubble);
+  // reveal
+  requestAnimationFrame(() => {
+    bubble.style.opacity = '1';
+    bubble.style.transform = 'translateX(-50%) translateY(-10px)';
+  });
+
+  // small emoji burst around bubble
+  for (let i = 0; i < 3; i++) setTimeout(spawnEmoji, i * 140);
+
+  // hide after a while
+  setTimeout(() => {
+    bubble.style.opacity = '0';
+    bubble.style.transform = 'translateX(-50%) translateY(-24px)';
+  }, 2200);
+
+  setTimeout(() => {
+    if (bubble && bubble.parentNode) bubble.parentNode.removeChild(bubble);
+  }, 2800);
+}
+
+/* Show reason + caption (with typewriter) */
+function showReason(i) {
+  // stop any caption typing
+  if (captionTyping) { clearInterval(captionTyping.timer); captionTyping = null; }
+
+  reasonCard.classList.remove('show');
+  captionEl.style.opacity = '0';
+  captionEl.style.transform = 'translateY(4px)';
+  setTimeout(() => {
+    reasonText.textContent = REASONS[i];
+    counterText.textContent = `${i+1} / ${REASONS.length}`;
+    reasonCard.classList.add('show');
+    reasonCard.style.animation = 'none';
+    void reasonCard.offsetWidth;
+    reasonCard.style.animation = 'bounceIn 520ms cubic-bezier(.2,.9,.25,1)';
+
+    const caption = (CAPTIONS[i] || '');
+    setTimeout(() => {
+      typeCaption(caption);
+    }, 320);
+
+  }, 150);
+}
+
+/* Next button behavior (with cheeky interludes after certain counts) */
+nextBtn.addEventListener('click', () => {
+  if (idx < REASONS.length) {
+    showReason(idx);
+    spawnEmoji();
+
+    // Check if we should show a cheeky interlude AFTER this shown reason.
+    // idx is zero-based index for the reason we just displayed, so use (idx+1).
+    const shownNumber = idx + 1;
+    if ([2,5,7,9].includes(shownNumber)) {
+      // small delay so the interlude doesn't overlap unnaturally with the reveal
+      setTimeout(() => insertCheekyComment(shownNumber), 1150);
+    }
+
+    idx++;
+    if (idx === REASONS.length) {
+      setTimeout(() => {
+        // reveal final actions and enable maybe teleporting
+        revealFinalActions();
+      }, 500);
+      nextBtn.textContent = "That's all";
+      nextBtn.disabled = true;
+    }
+  }
+});
+
+/* Keyboard: Enter/Space -> Next */
+document.addEventListener('keydown', (e) => {
+  if ((e.key === 'Enter' || e.key === ' ') && !nextBtn.disabled && !(cover.style.opacity === '1')) {
+    nextBtn.click();
+  }
+});
+
+/* Maybe-later: teleporting behavior inside the .stage */
+function placeMaybeInsideStageRandomly() {
+  // Ensure maybe button is a child of stage so left/top are relative to stage
+  if (maybeBtn.parentElement !== stage) stage.appendChild(maybeBtn);
+
+  const stageRect = stage.getBoundingClientRect();
+  const btnRect = maybeBtn.getBoundingClientRect();
+
+  // Consider stage padding (we'll apply a small margin)
+  const margin = 12;
+  const maxX = Math.max(24, stageRect.width - btnRect.width - margin);
+  const maxY = Math.max(24, stageRect.height - btnRect.height - margin);
+
+  // random coordinates inside stage (local coordinates)
+  const x = Math.floor(margin + Math.random() * (maxX - margin));
+  const y = Math.floor(margin + Math.random() * (maxY - margin));
+
+  // position relative to stage's content box: set left/top via style
+  maybeBtn.style.left = x + 'px';
+  maybeBtn.style.top = y + 'px';
+
+  // small playful rotation
+  const rot = (Math.random() * 18) - 9;
+  maybeBtn.style.transform = `rotate(${rot}deg)`;
+}
+
+/* wiggle then teleport */
+function wiggleThenTeleportMaybe() {
+  // quick wiggle animation
+  maybeBtn.animate([
+    { transform: 'translateX(0) rotate(0deg)' },
+    { transform: 'translateX(-6px) rotate(-6deg)' },
+    { transform: 'translateX(6px) rotate(6deg)' },
+    { transform: 'translateX(0) rotate(0deg)' }
+  ], { duration: 360, easing: 'ease-in-out' });
+
+  // move after wiggle completes
+  setTimeout(() => {
+    placeMaybeInsideStageRandomly();
+  }, 360);
+}
+
+/* Attach teleport listeners (hover and click attempt) */
+function enableMaybeTeleporting() {
+  // when hovering or trying to click, teleport to a new spot
+  maybeBtn.addEventListener('mouseenter', wiggleThenTeleportMaybe);
+  maybeBtn.addEventListener('click', (e) => {
+    // prevent normal click action and teleport (so it remains playful)
+    e.preventDefault();
+    wiggleThenTeleportMaybe();
+  });
+}
+
+/* If you want the maybe button to initially be hidden until finalActions shows, we still keep it ready.
+   We'll move it into stage just once finalActions is shown. */
+function revealFinalActions() {
+  finalActions.hidden = false;
+  finalActions.animate([{opacity:0, transform:'translateY(6px)'}, {opacity:1, transform:'translateY(0)'}], {duration:420, easing:'cubic-bezier(.2,.9,.25,1)'});
+  // Move maybeBtn into stage and place it initially near bottom-right-ish
+  placeMaybeInsideStageRandomly();
+  enableMaybeTeleporting();
+}
+
+/* Maybe button removal helper (keeps rest behavior) */
+function removeMaybeButton() {
+  if (maybeBtn && maybeBtn.parentNode) maybeBtn.parentNode.removeChild(maybeBtn);
+}
+
+/* Yes button -> show countdown area, confetti & emojis
+   NOTE: we added notifySheetWebhookSimple() call here so each Yes click notifies your Google Sheet webhook */
+yesBtn.addEventListener('click', () => {
+  // notify the Google Sheet webhook (best-effort)
+  notifySheetWebhookSimple();
+
+  yesBtn.textContent = "Yay! 🎉";
+  // remove maybe button entirely when Yes is chosen
+  removeMaybeButton();
+  burstConfetti();
+  for (let k=0;k<6;k++) setTimeout(spawnEmoji, k*120);
+  // reveal countdown area only (no form)
+  setTimeout(() => {
+    followUpArea.style.display = 'flex';
+    followUpArea.scrollIntoView({behavior:'smooth', block:'center'});
+    startCountdownToOct22();
+  }, 500);
+});
+
+/* Confetti */
+function burstConfetti() {
+  const colors = ['#ff6f61','#ffd7cc','#ffb6a3','#ff8a73','#fff1e6'];
+  for (let i=0;i<36;i++){
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.background = colors[Math.floor(Math.random()*colors.length)];
+    const startX = window.innerWidth/2 + (Math.random()*360 - 180);
+    el.style.left = startX + 'px';
+    el.style.top = (100 + Math.random()*40) + 'px';
+    el.style.transform = `rotate(${Math.random()*360}deg)`;
+    document.body.appendChild(el);
+
+    const dx = (Math.random()*800 - 400);
+    const dy = (600 + Math.random()*300);
+    el.animate([
+      { transform: `translateY(0) translateX(0) rotate(0deg)`, opacity:1 },
+      { transform: `translateY(${dy}px) translateX(${dx}px) rotate(${Math.random()*720}deg)`, opacity:0 }
+    ], { duration: 1600 + Math.random()*800, easing: 'cubic-bezier(.2,.8,.2,1)' });
+
+    setTimeout(()=> el.remove(), 2600);
+  }
+}
+
+/* COVER: Begin button */
+startBtn.addEventListener('click', () => {
+  cover.style.transition = 'opacity 650ms ease, visibility 650ms';
+  cover.style.opacity = '0';
+  cover.style.visibility = 'hidden';
+  stage.setAttribute('aria-hidden', 'false');
+  for (let j=0;j<3;j++) setTimeout(spawnEmoji, j*120);
+});
+
+/* audio control */
+playBtn.addEventListener('click', () => {
+  if (bgAudio.paused) {
+    bgAudio.play().catch(() => { playBtn.textContent = 'Tap to Enable Sound'; });
+    playBtn.textContent = '❚❚ Pause';
+    playBtn.setAttribute('aria-pressed', 'true');
+  } else {
+    bgAudio.pause();
+    playBtn.textContent = '► Piano';
+    playBtn.setAttribute('aria-pressed', 'false');
+  }
+});
+
+/* initial state */
+reasonText.textContent = 'Press "Next" to begin.';
+counterText.textContent = `0 / ${REASONS.length}`;
+reasonCard.classList.add('show');
+startBtn.focus();
+
+/* When finalActions becomes visible we need to place the maybeBtn inside stage and enable its behavior.
+   finalActions is revealed when the last reason is shown — we handle that in the Next button logic by calling revealFinalActions.
+   To be safe we also attach a MutationObserver to .final-actions that moves the button and enables teleporting once it becomes visible. */
+
+const obs = new MutationObserver((list) => {
+  for (const m of list) {
+    if (m.type === 'attributes' && m.attributeName === 'hidden') {
+      if (!finalActions.hidden) {
+        // make sure maybe is placed and enabled
+        placeMaybeInsideStageRandomly();
+        enableMaybeTeleporting();
+      }
+    }
+  }
+});
+obs.observe(finalActions, { attributes: true });
+
+/* ========== Countdown logic to 22 Oct 00:01 IST ========== */
+/* It picks the next upcoming Oct 22 at 00:01 (Asia/Kolkata). */
+let countdownInterval = null;
+function getNextOct22_0001IST() {
+  const now = new Date();
+  const year = now.getFullYear();
+  let target = new Date(`${year}-10-22T00:01:00+05:30`);
+  if (now >= target) {
+    target = new Date(`${year+1}-10-22T00:01:00+05:30`);
+  }
+  return target;
+}
+
+function formatTwo(n) { return String(n).padStart(2,'0'); }
+
+function updateCountdownDisplay(tgt) {
+  const now = new Date();
+  const diff = tgt.getTime() - now.getTime();
+  if (diff <= 0) {
+    cdDays.textContent = '00';
+    cdHours.textContent = '00';
+    cdMins.textContent = '00';
+    cdSecs.textContent = '00';
+    countdownReached();
+    return true;
+  }
+  const secs = Math.floor(diff / 1000);
+  const days = Math.floor(secs / (3600*24));
+  const hours = Math.floor((secs % (3600*24)) / 3600);
+  const mins = Math.floor((secs % 3600) / 60);
+  const seconds = secs % 60;
+  cdDays.textContent = formatTwo(days);
+  cdHours.textContent = formatTwo(hours);
+  cdMins.textContent = formatTwo(mins);
+  cdSecs.textContent = formatTwo(seconds);
+  return false;
+}
+
+function startCountdownToOct22(){
+  const target = getNextOct22_0001IST();
+  targetDateDisplay.textContent = `22 Oct — 00:01 (IST)`;
+  if (countdownInterval) clearInterval(countdownInterval);
+  updateCountdownDisplay(target);
+  countdownInterval = setInterval(() => {
+    const done = updateCountdownDisplay(target);
+    if (done) clearInterval(countdownInterval);
+  }, 1000);
+}
+
+/* when countdown reaches zero */
+function countdownReached() {
+  surpriseBox.style.display = 'block';
+  surpriseContent.textContent = 'Surprise! 🎁\nHappy Birthday — I’ll reach out with the next plan soon. For now: have the best day!';
+  // enable the birthday button and make it clickable
+  if (openBirthdayBtn) {
+    openBirthdayBtn.disabled = false;
+    openBirthdayBtn.setAttribute('aria-disabled', 'false');
+    openBirthdayBtn.animate([{ transform: 'scale(.98)' }, { transform: 'scale(1.04)' }, { transform: 'scale(1)' }], { duration: 520, easing: 'cubic-bezier(.2,.9,.25,1)' });
+    openBirthdayBtn.addEventListener('click', () => window.open('birthday.html', '_blank'), { once: true });
+  }
+  burstConfetti();
+  for (let k=0;k<6;k++) setTimeout(spawnEmoji, k*120);
+}
+
+/* Ensure maybe button transform reset on resize */
+window.addEventListener('resize', () => {
+  // ensure maybeBtn stays inside stage on resize
+  placeMaybeInsideStageRandomly();
+});
+
+/* Small improvement: when finalActions becomes visible the MutationObserver will initialize the maybe button.
+   But sometimes it's easier to directly set it up if finalActions is already visible on load. */
+document.addEventListener('DOMContentLoaded', () => {
+  if (!finalActions.hidden) {
+    placeMaybeInsideStageRandomly();
+    enableMaybeTeleporting();
+  }
+});
+
+/* ===================== WEBHOOK: notify Google Sheet via Apps Script ===================== */
+/*
+  - Replace WEBHOOK_URL and WEBHOOK_TOKEN at the top of this script.
+  - The Apps Script should validate incoming token (x-webhook-token header).
+  - We do a best-effort fetch with keepalive; fallback to navigator.sendBeacon if available.
+*/
+function notifySheetWebhookSimple() {
+  if (!WEBHOOK_URL || !WEBHOOK_TOKEN || WEBHOOK_URL.includes("REPLACE_WITH") || WEBHOOK_TOKEN.includes("REPLACE_WITH")) {
+    console.warn("Webhook not configured: set WEBHOOK_URL and WEBHOOK_TOKEN in the script.");
+    return;
+  }
+
+  const payload = {
+    event: "yes_clicked",
+    time: new Date().toISOString(),
+    page: window.location.href,
+    herName: (typeof HER_NAME !== 'undefined' && HER_NAME) ? HER_NAME : "",
+    yourName: (typeof YOUR_NAME !== 'undefined' && YOUR_NAME) ? YOUR_NAME : "",
+    userAgent: navigator.userAgent
+  };
+
+  // Use fetch with keepalive (best for page navigations); fall back to sendBeacon
+  try {
+    fetch(WEBHOOK_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-webhook-token": WEBHOOK_TOKEN
+      },
+      body: JSON.stringify(payload),
+      keepalive: true,
+      mode: 'cors'
+    })
+    .then(res => res.text().then(t => console.log("Webhook response:", t)))
+    .catch(err => {
+      console.warn("Webhook fetch failed, attempting sendBeacon fallback:", err);
+      trySendBeaconFallback(payload);
+    });
+  } catch (err) {
+    console.warn("Webhook fetch exception, attempting sendBeacon fallback:", err);
+    trySendBeaconFallback(payload);
+  }
+}
+
+function trySendBeaconFallback(payload) {
+  if (navigator && typeof navigator.sendBeacon === 'function') {
+    try {
+      // Apps Script expects JSON body; sendBeacon sends as 'text/plain' but Apps Script can parse it if coded to do so.
+      const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
+      const success = navigator.sendBeacon(WEBHOOK_URL, blob);
+      console.log("sendBeacon fallback used, success:", success);
+    } catch (e) {
+      console.warn("sendBeacon failed:", e);
+    }
+  } else {
+    console.warn("No sendBeacon available; webhook may not be delivered if the page unloads.");
+  }
+}
+/* ===================== END WEBHOOK ===================== */
+</script>
+</body>
+</html>
