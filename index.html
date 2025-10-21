@@ -39,7 +39,7 @@ body{
   border-radius:var(--radius);
   box-shadow:var(--shadow);
   padding:40px;
-  position:relative; /* important for maybeBtn positioning */
+  position:relative;
   overflow:visible;
 }
 
@@ -244,6 +244,22 @@ body{
 .cover h2{ margin:0 0 8px 0; font-size:24px; }
 .cover p{ margin:0; color:var(--muted); font-size:15px; }
 
+/* TEST MODE BANNER */
+.test-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: #ff6f61;
+  color: white;
+  padding: 8px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  z-index: 3000;
+  letter-spacing: 0.5px;
+}
+
 /* playful wiggle */
 @keyframes wiggle {
   0% { transform: translateX(0) rotate(0deg); }
@@ -271,10 +287,15 @@ body{
 </head>
 <body>
 
+<!-- TEST MODE BANNER (shown only in test mode) -->
+<div id="testBanner" class="test-banner" style="display:none;">
+  🧪 TEST MODE - Countdown reduced to 30 seconds for testing
+</div>
+
 <!-- COVER -->
 <div class="cover" id="cover">
   <div class="cover-card" role="dialog" aria-modal="true">
-    <h2 id="coverTitle">Hi, [HER NAME] 🌸</h2>
+    <h2 id="coverTitle">Hi, Nikita 🌸</h2>
     <p style="margin-top:10px; line-height:1.5;">I made a little page with 10 honest reasons — each one is short. Tap <strong>Begin</strong> when you're ready. (No pressure ✨)</p>
     <div style="margin-top:20px;">
       <button id="startBtn" class="btn primary" style="padding:12px 22px;">Begin</button>
@@ -288,7 +309,7 @@ body{
 
   <div class="header">
     <div class="title">
-      <h1>Hey, <span id="herName">[HER NAME]</span></h1>
+      <h1>Hey, <span id="herName">Nikita</span></h1>
       <p>10 Reasons - Mujhse Dosti Karogi? IT guy way (Friendzone nhi)</p>
     </div>
 
@@ -302,7 +323,7 @@ body{
 
     <div class="card-wrap">
       <div class="reason-card" id="reasonCard" role="status" aria-live="polite" aria-atomic="true">
-        <p class="reason-text" id="reasonText">Press “Next” to begin.</p>
+        <p class="reason-text" id="reasonText">Press "Next" to begin.</p>
         <div class="counter" id="counterText">0 / 10</div>
       </div>
     </div>
@@ -312,16 +333,15 @@ body{
 
       <div class="final-actions" id="finalActions" hidden>
         <button class="btn primary" id="yesBtn">Yes — let's try 💫</button>
-        <!-- maybeBtn will be moved into .stage for teleporting behavior -->
         <button class="btn ghost" id="maybeBtn" aria-label="Maybe later">Maybe later</button>
       </div>
     </div>
 
     <div class="caption" id="caption"></div>
 
-    <!-- follow-up area: countdown + simple note (no scheduling form) -->
+    <!-- follow-up area: countdown + simple note -->
     <div id="followUpArea" class="followup" style="display:none;">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px;">
         <div>
           <div style="font-weight:700;">Next Surprise on 22 Oct</div>
           <div class="followup-note">The next surprise will unlock at 00:01 IST on 22 Oct.</div>
@@ -354,67 +374,67 @@ body{
         <div style="font-weight:700; font-size:16px;">Surprise — coming soon 🎁</div>
         <div id="surpriseContent" style="margin-top:12px; color:var(--muted);">The next surprise will appear here on the target date (22 Oct 00:01 IST).</div>
 
-        <!-- Button that will open birthday.html — initially disabled until countdown reaches zero -->
+        <!-- Button that will redirect to birthday.html -->
         <div style="margin-top:12px;">
-          <button id="openBirthdayBtn" class="btn primary" disabled aria-disabled="true" title="Opens on 22 Oct">Open Birthday</button>
+          <button id="openBirthdayBtn" class="btn primary" disabled aria-disabled="true" title="Opens on 22 Oct">Open Birthday Surprise</button>
         </div>
       </div>
     </div>
 
-    <p class="signature" id="signature">— <span id="yourName">[YOUR NAME]</span></p>
+    <p class="signature" id="signature">— <span id="yourName">Jatin</span></p>
   </div>
 </div>
 
 <!-- audio -->
 <audio id="bgAudio" loop preload="none">
   <source src="https://cdn.pixabay.com/download/audio/2022/10/03/audio_6c8a8c83f2.mp3?filename=soft-piano-ambient-122702.mp3" type="audio/mpeg">
-  <!-- Replace with your own track if you'd like -->
 </audio>
 
 <script>
 /* ========== EDITABLE FIELDS ========== */
-// Put names here if you want to set them directly; leave blank to keep placeholders
-const HER_NAME = "Nikita";   // <-- put her name here (optional)
-const YOUR_NAME = "Jatin";  // <-- put your name here (optional)
+const HER_NAME = "Nikita";
+const YOUR_NAME = "Jatin";
 
-/* WEBHOOK CONFIG - put your deployed Apps Script web app URL and the secret token here */
-const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwsm5RwOvkZktOEpZYano0vS8wgO3mEWtV9vGeSanMx7OON51rS8Vg0oJ5kp1cY24CwMg/exec"; // <-- replace with your Apps Script web app URL
-const WEBHOOK_TOKEN = "ilovekupwara"; // <-- must match the token in your Apps Script
+/* WEBHOOK CONFIG */
+const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbwsm5RwOvkZktOEpZYano0vS8wgO3mEWtV9vGeSanMx7OON51rS8Vg0oJ5kp1cY24CwMg/exec";
+const WEBHOOK_TOKEN = "ilovekupwara";
 
+/* ========== TEST MODE TOGGLE ========== */
+/* Set this to true for local testing (countdown will be 30 seconds instead of actual date) */
+const TEST_MODE = false; // Change to true for local testing
 /* ===================================== */
 
 /* Reasons + captions arrays */
 const REASONS = [
   "I actually listen — and I remember those tiny details you mention.",
-  "I’ll be your coolest friend with latest trends.",
-  "I’ll try to put a smile on that beautiful face.",
-  "I’ll make chapati and tea for you.",
-  "I’ll be the first one to root for your style.",
-  "I’ll be honest, even when it’s awkward.",
-  "I’ll plan small surprises.",
-  "I’ll make sure you smile when it's needed.",
-  "I’ll notice when you’re quiet and hold space for you.",
+  "I'll be your coolest friend with latest trends.",
+  "I'll try to put a smile on that beautiful face.",
+  "I'll make chapati and tea for you.",
+  "I'll be the first one to root for your style.",
+  "I'll be honest, even when it's awkward.",
+  "I'll plan small surprises.",
+  "I'll make sure you smile when it's needed.",
+  "I'll notice when you're quiet and hold space for you.",
   "Because I want to know you properly — not just surface-level."
 ];
 
 const CAPTIONS = [
-  "Because I actually pay attention... even to the tiny things you think I’d forget 😉",
-  "You’ll never have to scroll for the trend — I’ll probably send it first 😎",
-  "Smiles look better on you — that’s just facts 💖",
+  "Because I actually pay attention... even to the tiny things you think I'd forget 😉",
+  "You'll never have to scroll for the trend — I'll probably send it first 😎",
+  "Smiles look better on you — that's just facts 💖",
   "Yes, I can cook... but only if you promise to do the taste test 😋🍵",
   "Your style deserves a hype team — I volunteer 🔥",
-  "Honesty might be awkward, but it’s also kinda rare... so you get it raw 🫣💬",
+  "Honesty might be awkward, but it's also kinda rare... so you get it raw 🫣💬",
   "Tiny surprises, big smiles 🎁",
-  "Even bad days deserve a little laughter — I’ll bring the funny 😄🌤️",
+  "Even bad days deserve a little laughter — I'll bring the funny 😄🌤️",
   "I notice the silence too — sometimes it says more than words 💭",
-  "Because knowing you isn’t casual — it’s something I actually care about 💕"
+  "Because knowing you isn't casual — it's something I actually care about 💕"
 ];
 
-/* Cheeky interlude lines for specific positions (after 2nd, 5th, 7th, 9th) */
 const CHEEKY_COMMENTS = {
   2: [
-    "You still reading? 👀 someone’s curious...",
-    "Haha, you’re actually reading all of them 😄",
+    "You still reading? 👀 someone's curious...",
+    "Haha, you're actually reading all of them 😄",
     "Caught you smiling — admit it 😉"
   ],
   5: [
@@ -423,14 +443,14 @@ const CHEEKY_COMMENTS = {
     "Woah, you made it halfway! Determined, I see 💪"
   ],
   7: [
-    "Okay... you’re invested now 😌",
+    "Okay... you're invested now 😌",
     "Still here? Cute. 🥹",
-    "You’re not skipping, right? 👀"
+    "You're not skipping, right? 👀"
   ],
   9: [
     "Almost done... nervous yet? 😅",
     "One more to go... I saved the best for last 💫",
-    "Okay last one coming — promise it’s worth it ❤️"
+    "Okay last one coming — promise it's worth it ❤️"
   ]
 };
 
@@ -451,7 +471,6 @@ const maybeBtn = document.getElementById('maybeBtn');
 const captionEl = document.getElementById('caption');
 const bgAudio = document.getElementById('bgAudio');
 const playBtn = document.getElementById('playBtn');
-
 const followUpArea = document.getElementById('followUpArea');
 const cdDays = document.getElementById('cdDays');
 const cdHours = document.getElementById('cdHours');
@@ -461,14 +480,12 @@ const targetDateDisplay = document.getElementById('targetDateDisplay');
 const surpriseBox = document.getElementById('surpriseBox');
 const surpriseContent = document.getElementById('surpriseContent');
 const openBirthdayBtn = document.getElementById('openBirthdayBtn');
+const testBanner = document.getElementById('testBanner');
 
-/* Insert names if provided */
-if (HER_NAME && HER_NAME.trim().length) {
-  herNameEl.textContent = HER_NAME;
-  coverTitle.textContent = `Hi, ${HER_NAME} 🌸`;
-}
-if (YOUR_NAME && YOUR_NAME.trim().length) {
-  yourNameEl.textContent = YOUR_NAME;
+/* Show test banner if in test mode */
+if (TEST_MODE) {
+  testBanner.style.display = 'block';
+  console.log('🧪 TEST MODE ACTIVE - Countdown set to 30 seconds');
 }
 
 /* State */
@@ -529,7 +546,7 @@ function spawnEmoji() {
   setTimeout(() => el.remove(), 2200);
 }
 
-/* Insert cheeky bubble interlude (appears temporarily) */
+/* Insert cheeky bubble interlude */
 function insertCheekyComment(positionIndex) {
   const lines = CHEEKY_COMMENTS[positionIndex];
   if (!lines || lines.length === 0) return;
@@ -540,16 +557,13 @@ function insertCheekyComment(positionIndex) {
   bubble.textContent = text;
 
   stage.appendChild(bubble);
-  // reveal
   requestAnimationFrame(() => {
     bubble.style.opacity = '1';
     bubble.style.transform = 'translateX(-50%) translateY(-10px)';
   });
 
-  // small emoji burst around bubble
   for (let i = 0; i < 3; i++) setTimeout(spawnEmoji, i * 140);
 
-  // hide after a while
   setTimeout(() => {
     bubble.style.opacity = '0';
     bubble.style.transform = 'translateX(-50%) translateY(-24px)';
@@ -560,9 +574,8 @@ function insertCheekyComment(positionIndex) {
   }, 2800);
 }
 
-/* Show reason + caption (with typewriter) */
+/* Show reason + caption */
 function showReason(i) {
-  // stop any caption typing
   if (captionTyping) { clearInterval(captionTyping.timer); captionTyping = null; }
 
   reasonCard.classList.remove('show');
@@ -584,24 +597,20 @@ function showReason(i) {
   }, 150);
 }
 
-/* Next button behavior (with cheeky interludes after certain counts) */
+/* Next button behavior */
 nextBtn.addEventListener('click', () => {
   if (idx < REASONS.length) {
     showReason(idx);
     spawnEmoji();
 
-    // Check if we should show a cheeky interlude AFTER this shown reason.
-    // idx is zero-based index for the reason we just displayed, so use (idx+1).
     const shownNumber = idx + 1;
     if ([2,5,7,9].includes(shownNumber)) {
-      // small delay so the interlude doesn't overlap unnaturally with the reveal
       setTimeout(() => insertCheekyComment(shownNumber), 1150);
     }
 
     idx++;
     if (idx === REASONS.length) {
       setTimeout(() => {
-        // reveal final actions and enable maybe teleporting
         revealFinalActions();
       }, 500);
       nextBtn.textContent = "That's all";
@@ -617,35 +626,28 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
-/* Maybe-later: teleporting behavior inside the .stage */
+/* Maybe-later: teleporting behavior */
 function placeMaybeInsideStageRandomly() {
-  // Ensure maybe button is a child of stage so left/top are relative to stage
   if (maybeBtn.parentElement !== stage) stage.appendChild(maybeBtn);
 
   const stageRect = stage.getBoundingClientRect();
   const btnRect = maybeBtn.getBoundingClientRect();
 
-  // Consider stage padding (we'll apply a small margin)
   const margin = 12;
   const maxX = Math.max(24, stageRect.width - btnRect.width - margin);
   const maxY = Math.max(24, stageRect.height - btnRect.height - margin);
 
-  // random coordinates inside stage (local coordinates)
   const x = Math.floor(margin + Math.random() * (maxX - margin));
   const y = Math.floor(margin + Math.random() * (maxY - margin));
 
-  // position relative to stage's content box: set left/top via style
   maybeBtn.style.left = x + 'px';
   maybeBtn.style.top = y + 'px';
 
-  // small playful rotation
   const rot = (Math.random() * 18) - 9;
   maybeBtn.style.transform = `rotate(${rot}deg)`;
 }
 
-/* wiggle then teleport */
 function wiggleThenTeleportMaybe() {
-  // quick wiggle animation
   maybeBtn.animate([
     { transform: 'translateX(0) rotate(0deg)' },
     { transform: 'translateX(-6px) rotate(-6deg)' },
@@ -653,54 +655,41 @@ function wiggleThenTeleportMaybe() {
     { transform: 'translateX(0) rotate(0deg)' }
   ], { duration: 360, easing: 'ease-in-out' });
 
-  // move after wiggle completes
   setTimeout(() => {
     placeMaybeInsideStageRandomly();
   }, 360);
 }
 
-/* Attach teleport listeners (hover and click attempt) */
 function enableMaybeTeleporting() {
-  // when hovering or trying to click, teleport to a new spot
   maybeBtn.addEventListener('mouseenter', wiggleThenTeleportMaybe);
   maybeBtn.addEventListener('click', (e) => {
-    // prevent normal click action and teleport (so it remains playful)
     e.preventDefault();
     wiggleThenTeleportMaybe();
   });
 }
 
-/* If you want the maybe button to initially be hidden until finalActions shows, we still keep it ready.
-   We'll move it into stage just once finalActions is shown. */
 function revealFinalActions() {
   finalActions.hidden = false;
   finalActions.animate([{opacity:0, transform:'translateY(6px)'}, {opacity:1, transform:'translateY(0)'}], {duration:420, easing:'cubic-bezier(.2,.9,.25,1)'});
-  // Move maybeBtn into stage and place it initially near bottom-right-ish
   placeMaybeInsideStageRandomly();
   enableMaybeTeleporting();
 }
 
-/* Maybe button removal helper (keeps rest behavior) */
 function removeMaybeButton() {
   if (maybeBtn && maybeBtn.parentNode) maybeBtn.parentNode.removeChild(maybeBtn);
 }
 
-/* Yes button -> show countdown area, confetti & emojis
-   NOTE: we added notifySheetWebhookSimple() call here so each Yes click notifies your Google Sheet webhook */
+/* Yes button -> show countdown area */
 yesBtn.addEventListener('click', () => {
-  // notify the Google Sheet webhook (best-effort)
   notifySheetWebhookSimple();
-
   yesBtn.textContent = "Yay! 🎉";
-  // remove maybe button entirely when Yes is chosen
   removeMaybeButton();
   burstConfetti();
   for (let k=0;k<6;k++) setTimeout(spawnEmoji, k*120);
-  // reveal countdown area only (no form)
   setTimeout(() => {
     followUpArea.style.display = 'flex';
     followUpArea.scrollIntoView({behavior:'smooth', block:'center'});
-    startCountdownToOct22();
+    startCountdown();
   }, 500);
 });
 
@@ -756,15 +745,10 @@ counterText.textContent = `0 / ${REASONS.length}`;
 reasonCard.classList.add('show');
 startBtn.focus();
 
-/* When finalActions becomes visible we need to place the maybeBtn inside stage and enable its behavior.
-   finalActions is revealed when the last reason is shown — we handle that in the Next button logic by calling revealFinalActions.
-   To be safe we also attach a MutationObserver to .final-actions that moves the button and enables teleporting once it becomes visible. */
-
 const obs = new MutationObserver((list) => {
   for (const m of list) {
     if (m.type === 'attributes' && m.attributeName === 'hidden') {
       if (!finalActions.hidden) {
-        // make sure maybe is placed and enabled
         placeMaybeInsideStageRandomly();
         enableMaybeTeleporting();
       }
@@ -773,17 +757,25 @@ const obs = new MutationObserver((list) => {
 });
 obs.observe(finalActions, { attributes: true });
 
-/* ========== Countdown logic to 22 Oct 00:01 IST ========== */
-/* It picks the next upcoming Oct 22 at 00:01 (Asia/Kolkata). */
+/* ========== COUNTDOWN LOGIC ========== */
 let countdownInterval = null;
-function getNextOct22_0001IST() {
-  const now = new Date();
-  const year = now.getFullYear();
-  let target = new Date(`${year}-10-22T00:01:00+05:30`);
-  if (now >= target) {
-    target = new Date(`${year+1}-10-22T00:01:00+05:30`);
+
+function getTargetDate() {
+  if (TEST_MODE) {
+    // TEST MODE: 30 seconds from now
+    const testTarget = new Date();
+    testTarget.setSeconds(testTarget.getSeconds() + 30);
+    return testTarget;
+  } else {
+    // PRODUCTION: Oct 22, 2025 00:01 IST
+    const now = new Date();
+    const year = now.getFullYear();
+    let target = new Date(`${year}-10-22T00:01:00+05:30`);
+    if (now >= target) {
+      target = new Date(`${year+1}-10-22T00:01:00+05:30`);
+    }
+    return target;
   }
-  return target;
 }
 
 function formatTwo(n) { return String(n).padStart(2,'0'); }
@@ -811,9 +803,15 @@ function updateCountdownDisplay(tgt) {
   return false;
 }
 
-function startCountdownToOct22(){
-  const target = getNextOct22_0001IST();
-  targetDateDisplay.textContent = `22 Oct — 00:01 (IST)`;
+function startCountdown(){
+  const target = getTargetDate();
+  
+  if (TEST_MODE) {
+    targetDateDisplay.textContent = `Test: ${target.toLocaleTimeString('en-IN')}`;
+  } else {
+    targetDateDisplay.textContent = `22 Oct — 00:01 (IST)`;
+  }
+  
   if (countdownInterval) clearInterval(countdownInterval);
   updateCountdownDisplay(target);
   countdownInterval = setInterval(() => {
@@ -825,26 +823,32 @@ function startCountdownToOct22(){
 /* when countdown reaches zero */
 function countdownReached() {
   surpriseBox.style.display = 'block';
-  surpriseContent.textContent = 'Surprise! 🎁\nHappy Birthday — I’ll reach out with the next plan soon. For now: have the best day!';
-  // enable the birthday button and make it clickable
+  surpriseContent.textContent = 'Surprise! 🎁\nHappy Birthday — opening your special surprise now...';
+  
   if (openBirthdayBtn) {
     openBirthdayBtn.disabled = false;
     openBirthdayBtn.setAttribute('aria-disabled', 'false');
     openBirthdayBtn.animate([{ transform: 'scale(.98)' }, { transform: 'scale(1.04)' }, { transform: 'scale(1)' }], { duration: 520, easing: 'cubic-bezier(.2,.9,.25,1)' });
-    openBirthdayBtn.addEventListener('click', () => window.open('birthday.html', '_blank'), { once: true });
+    
+    // ✅ FIXED: Redirect to birthday.html in same tab
+    openBirthdayBtn.addEventListener('click', () => {
+      window.location.href = 'birthday.html';
+    }, { once: true });
   }
+  
   burstConfetti();
   for (let k=0;k<6;k++) setTimeout(spawnEmoji, k*120);
+  
+  // Auto-redirect after 3 seconds
+  setTimeout(() => {
+    window.location.href = 'birthday.html';
+  }, 3000);
 }
 
-/* Ensure maybe button transform reset on resize */
 window.addEventListener('resize', () => {
-  // ensure maybeBtn stays inside stage on resize
   placeMaybeInsideStageRandomly();
 });
 
-/* Small improvement: when finalActions becomes visible the MutationObserver will initialize the maybe button.
-   But sometimes it's easier to directly set it up if finalActions is already visible on load. */
 document.addEventListener('DOMContentLoaded', () => {
   if (!finalActions.hidden) {
     placeMaybeInsideStageRandomly();
@@ -852,15 +856,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-/* ===================== WEBHOOK: notify Google Sheet via Apps Script ===================== */
-/*
-  - Replace WEBHOOK_URL and WEBHOOK_TOKEN at the top of this script.
-  - The Apps Script should validate incoming token (x-webhook-token header).
-  - We do a best-effort fetch with keepalive; fallback to navigator.sendBeacon if available.
-*/
+/* ========== WEBHOOK ========== */
 function notifySheetWebhookSimple() {
   if (!WEBHOOK_URL || !WEBHOOK_TOKEN || WEBHOOK_URL.includes("REPLACE_WITH") || WEBHOOK_TOKEN.includes("REPLACE_WITH")) {
-    console.warn("Webhook not configured: set WEBHOOK_URL and WEBHOOK_TOKEN in the script.");
+    console.warn("Webhook not configured");
     return;
   }
 
@@ -868,12 +867,11 @@ function notifySheetWebhookSimple() {
     event: "yes_clicked",
     time: new Date().toISOString(),
     page: window.location.href,
-    herName: (typeof HER_NAME !== 'undefined' && HER_NAME) ? HER_NAME : "",
-    yourName: (typeof YOUR_NAME !== 'undefined' && YOUR_NAME) ? YOUR_NAME : "",
+    herName: HER_NAME,
+    yourName: YOUR_NAME,
     userAgent: navigator.userAgent
   };
 
-  // Use fetch with keepalive (best for page navigations); fall back to sendBeacon
   try {
     fetch(WEBHOOK_URL, {
       method: "POST",
@@ -887,11 +885,11 @@ function notifySheetWebhookSimple() {
     })
     .then(res => res.text().then(t => console.log("Webhook response:", t)))
     .catch(err => {
-      console.warn("Webhook fetch failed, attempting sendBeacon fallback:", err);
+      console.warn("Webhook fetch failed:", err);
       trySendBeaconFallback(payload);
     });
   } catch (err) {
-    console.warn("Webhook fetch exception, attempting sendBeacon fallback:", err);
+    console.warn("Webhook fetch exception:", err);
     trySendBeaconFallback(payload);
   }
 }
@@ -899,18 +897,14 @@ function notifySheetWebhookSimple() {
 function trySendBeaconFallback(payload) {
   if (navigator && typeof navigator.sendBeacon === 'function') {
     try {
-      // Apps Script expects JSON body; sendBeacon sends as 'text/plain' but Apps Script can parse it if coded to do so.
       const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
       const success = navigator.sendBeacon(WEBHOOK_URL, blob);
       console.log("sendBeacon fallback used, success:", success);
     } catch (e) {
       console.warn("sendBeacon failed:", e);
     }
-  } else {
-    console.warn("No sendBeacon available; webhook may not be delivered if the page unloads.");
   }
 }
-/* ===================== END WEBHOOK ===================== */
 </script>
 </body>
 </html>
