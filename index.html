@@ -762,21 +762,25 @@ let countdownInterval = null;
 
 function getTargetDate() {
   if (TEST_MODE) {
-    // TEST MODE: 30 seconds from now
     const testTarget = new Date();
     testTarget.setSeconds(testTarget.getSeconds() + 30);
     return testTarget;
   } else {
-    // PRODUCTION: Oct 22, 2025 00:01 IST
     const now = new Date();
     const year = now.getFullYear();
-    let target = new Date(`${year}-10-22T00:01:00+05:30`);
-    if (now >= target) {
-      target = new Date(`${year+1}-10-22T00:01:00+05:30`);
+    const target = new Date(`${year}-10-22T00:01:00+05:30`);
+    const endOfBirthday = new Date(`${year}-10-22T23:59:59+05:30`);
+    
+    // If it's currently Oct 22, keep target as-is so countdown hits zero
+    // If we're past Oct 22, move to next year
+    if (now > endOfBirthday) {
+      return new Date(`${year+1}-10-22T00:01:00+05:30`);
     }
+    
     return target;
   }
 }
+
 
 function formatTwo(n) { return String(n).padStart(2,'0'); }
 
